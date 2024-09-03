@@ -15,6 +15,8 @@ public class DungeonGenerator : MonoBehaviour
     
     public List<int[,]> rooms = new List<int[,]>();
 
+    public int[,] fullDungeonArray;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -78,22 +80,53 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
+        CombineRoomsIntoArray();
+    }
+
+    public void CombineRoomsIntoArray()
+    {
+        // Calculate the size of the big array
+        int bigArrayWidth = 3 * maxRoomWidth;
+        int bigArrayLength = 3 * maxRoomLength;
+    
+        // Create the big array
+        fullDungeonArray = new int[bigArrayWidth, bigArrayLength];
+    
+        // Loop through each room and place it in the big array
+        for (int a = 0; a < 3; a++)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                // Get the current room
+                int[,] room = rooms[i + (a * 3)];
+            
+                // Calculate the starting position in the big array
+                int startX = i * maxRoomWidth;
+                int startY = a * maxRoomLength;
+            
+                // Copy the room into the big array
+                for (int j = 0; j < room.GetLength(0); j++)
+                {
+                    for (int k = 0; k < room.GetLength(1); k++)
+                    {
+                        fullDungeonArray[startX + j, startY + k] = room[j, k];
+                    }
+                }
+            }
+        }
+
         SpawnDungeon();
     }
 
     public void SpawnDungeon()
     {
-        for (int a = 0; a < 3; a++)
+        for (int i = 0; i < fullDungeonArray.GetLength(0); i++)
         {
-            for (int i = 0; i < 3; i++)
+            for (int j = 0; j < fullDungeonArray.GetLength(1); j++)
             {
-                for (int j = 0; j < rooms[i].GetLength(0); j++)
+                if (fullDungeonArray[i, j] != 0)
                 {
-                    for (int k = 0; k < rooms[i].GetLength(1); k++)
-                    {
-                        if (rooms[i + (a * 3)][j, k] != 0)
-                        Instantiate(floorPrefab, new Vector3(j + (rooms[0].GetLength(0) * i), 0, k - (rooms[0].GetLength(1) * a)), Quaternion.identity);
-                    }
+                    Instantiate(floorPrefab, new Vector3(i, 0, j), Quaternion.identity);
                 }
             }
         }
