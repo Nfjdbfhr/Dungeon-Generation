@@ -12,8 +12,10 @@ public class DungeonGenerator : MonoBehaviour
     public int minRooms = 4;
 
     public GameObject floorPrefab;
+    public GameObject roomCenter;
     
     public List<int[,]> rooms = new List<int[,]>();
+    public List<RoomCenterCoord> roomCenters = new List<RoomCenterCoord>();
 
     public int[,] fullDungeonArray;
 
@@ -55,32 +57,56 @@ public class DungeonGenerator : MonoBehaviour
             }
 
             int[,] roomArea = rooms[i];
-            
+        
             int length = Random.Range(minRoomLength, maxRoomLength + 1);
             int width = Random.Range(minRoomWidth, maxRoomWidth + 1);
-            
+        
             int rowsDown = Random.Range(0, (maxRoomWidth - width) + 1);
-            int coloumsRight = Random.Range(0, (maxRoomLength - length) + 1);
-            
-            for (int j = coloumsRight; j < coloumsRight + length; j++)
+            int columnsRight = Random.Range(0, (maxRoomLength - length) + 1);
+        
+            // Fill room edges with 1
+            for (int j = columnsRight; j < columnsRight + length; j++)
             {
                 roomArea[rowsDown, j] = 1;
                 roomArea[rowsDown + width - 1, j] = 1;
             }
             for (int j = rowsDown; j < rowsDown + width; j++)
             {
-                for (int k = coloumsRight; k < coloumsRight + length; k++)
+                for (int k = columnsRight; k < columnsRight + length; k++)
                 {
-                    roomArea[j, k] = 1;
                     roomArea[j, k] = 1;
                 }
 
-                roomArea[j, coloumsRight] = 1;
-                roomArea[j, coloumsRight + length - 1] = 1;
+                roomArea[j, columnsRight] = 1;
+                roomArea[j, columnsRight + length - 1] = 1;
+            }
+
+            // Set the center spot to 2
+            int centerRow = rowsDown + width / 2;
+            int centerColumn = columnsRight + length / 2;
+
+            // Ensure center is within bounds
+            if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
+            {
+                roomArea[centerRow, centerColumn] = 2;
             }
         }
 
         CombineRoomsIntoArray();
+    }
+
+    public struct RoomCenterCoord
+    {
+        public int roomNum { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public RoomCenterCoord(int roomNumber, int x, int y)
+        {
+            roomNum = roomNumber;
+            X = x;
+            Y = y;
+        }
     }
 
     public void CombineRoomsIntoArray()
@@ -110,6 +136,10 @@ public class DungeonGenerator : MonoBehaviour
                     for (int k = 0; k < room.GetLength(1); k++)
                     {
                         fullDungeonArray[startX + j, startY + k] = room[j, k];
+                        if (fullDungeonArray[startX + j, startY + k] != 0 && fullDungeonArray[startX + j, startY + k] != 1)
+                        {
+                            roomCenters.Add(new RoomCenterCoord(i + (a * 3), startX + j, startY + k));
+                        }
                     }
                 }
             }
@@ -126,7 +156,14 @@ public class DungeonGenerator : MonoBehaviour
             {
                 if (fullDungeonArray[i, j] != 0)
                 {
-                    Instantiate(floorPrefab, new Vector3(i, 0, j), Quaternion.identity);
+                    if (fullDungeonArray[i, j] == 1)
+                    {
+                        Instantiate(floorPrefab, new Vector3(i, 0, j), Quaternion.identity);
+                    }
+                    else
+                    {
+                        Instantiate(roomCenter, new Vector3(i, 0, j), Quaternion.identity);
+                    }
                 }
             }
         }
