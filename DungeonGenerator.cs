@@ -19,6 +19,20 @@ public class DungeonGenerator : MonoBehaviour
 
     public int[,] fullDungeonArray;
 
+    public struct RoomCenterCoord
+    {
+        public int roomNum { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public RoomCenterCoord(int roomNumber, int x, int y)
+        {
+            roomNum = roomNumber;
+            X = x;
+            Y = y;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -93,20 +107,6 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         CombineRoomsIntoArray();
-    }
-
-    public struct RoomCenterCoord
-    {
-        public int roomNum { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public RoomCenterCoord(int roomNumber, int x, int y)
-        {
-            roomNum = roomNumber;
-            X = x;
-            Y = y;
-        }
     }
 
     public void CombineRoomsIntoArray()
