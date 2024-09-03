@@ -77,8 +77,7 @@ public class DungeonGenerator : MonoBehaviour
         
             int rowsDown = Random.Range(0, (maxRoomWidth - width) + 1);
             int columnsRight = Random.Range(0, (maxRoomLength - length) + 1);
-        
-            // Fill room edges with 1
+
             for (int j = columnsRight; j < columnsRight + length; j++)
             {
                 roomArea[rowsDown, j] = 1;
@@ -95,11 +94,9 @@ public class DungeonGenerator : MonoBehaviour
                 roomArea[j, columnsRight + length - 1] = 1;
             }
 
-            // Set the center spot to 2
             int centerRow = rowsDown + width / 2;
             int centerColumn = columnsRight + length / 2;
 
-            // Ensure center is within bounds
             if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
             {
                 roomArea[centerRow, centerColumn] = 2;
@@ -111,26 +108,20 @@ public class DungeonGenerator : MonoBehaviour
 
     public void CombineRoomsIntoArray()
     {
-        // Calculate the size of the big array
         int bigArrayWidth = 3 * maxRoomWidth;
         int bigArrayLength = 3 * maxRoomLength;
     
-        // Create the big array
         fullDungeonArray = new int[bigArrayWidth, bigArrayLength];
     
-        // Loop through each room and place it in the big array
         for (int a = 0; a < 3; a++)
         {
             for (int i = 0; i < 3; i++)
             {
-                // Get the current room
                 int[,] room = rooms[i + (a * 3)];
             
-                // Calculate the starting position in the big array
                 int startX = i * maxRoomWidth;
                 int startY = a * maxRoomLength;
             
-                // Copy the room into the big array
                 for (int j = 0; j < room.GetLength(0); j++)
                 {
                     for (int k = 0; k < room.GetLength(1); k++)
