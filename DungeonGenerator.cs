@@ -13,6 +13,8 @@ public class DungeonGenerator : MonoBehaviour
 
     public GameObject floorPrefab;
     public GameObject roomCenter;
+    public GameObject startSpace;
+    public GameObject endSpace;
     
     public List<int[,]> rooms = new List<int[,]>();
     public List<RoomCenterCoord> roomCenters = new List<RoomCenterCoord>();
@@ -78,12 +80,51 @@ public class DungeonGenerator : MonoBehaviour
     {
         int roomSkipsLeft = rooms.Count - minRooms;
 
+        int startRoom = Random.Range(0, rooms.Count);
+        int endRoom = 0;
+        do
+        {
+            endRoom = Random.Range(0, rooms.Count);
+        }
+        while (endRoom == startRoom);
+
         for (int i = 0; i < rooms.Count; i++)
         {
-            if (roomSkipsLeft > 0 && Random.Range(0, 4) == 2 && i != rooms.Count - 1)
+
+            Debug.Log(i);
+
+            if (roomSkipsLeft > 0 && Random.Range(0, 4) == 2)
             {
-                roomSkipsLeft--;
-                continue;
+                if (i != 8)
+                {
+                    if (i == startRoom)
+                    {
+                        startRoom++;
+                    }
+                    if (i == endRoom)
+                    {
+                        endRoom++;
+                    }
+
+                    Debug.Log(i + ": Skipped");
+
+                    roomSkipsLeft--;
+                    continue;
+                }
+            }
+
+            if (i == rooms.Count - 1 && startRoom == endRoom)
+            {
+                for (int row = 0; row < rooms[0].GetLength(0); row++)
+                {
+                    for (int col = 0; col < rooms[0].GetLength(1); col++)
+                    {
+                        if (rooms[0][row, col] == 2)
+                        {
+                            rooms[0][row, col] = 3;
+                        }
+                    }
+                }
             }
 
             int[,] roomArea = rooms[i];
@@ -119,7 +160,18 @@ public class DungeonGenerator : MonoBehaviour
 
                 if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
                 {
-                    roomArea[centerRow, centerColumn] = 2;
+                    if (i == startRoom)
+                    {
+                        roomArea[centerRow, centerColumn] = 3;
+                    }
+                    else if (i == endRoom)
+                    {
+                        roomArea[centerRow, centerColumn] = 4;
+                    }
+                    else
+                    {
+                        roomArea[centerRow, centerColumn] = 2;
+                    }
                 }
             }
             else if (roomType == 2  || roomType == 3)
@@ -151,7 +203,18 @@ public class DungeonGenerator : MonoBehaviour
 
                 if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
                 {
-                    roomArea[centerRow, centerColumn] = 2;
+                    if (i == startRoom)
+                    {
+                        roomArea[centerRow, centerColumn] = 3;
+                    }
+                    else if (i == endRoom)
+                    {
+                        roomArea[centerRow, centerColumn] = 4;
+                    }
+                    else
+                    {
+                        roomArea[centerRow, centerColumn] = 2;
+                    }
                 }
 
                 int position = Random.Range(0, 2);
@@ -247,8 +310,19 @@ public class DungeonGenerator : MonoBehaviour
                         middleY = currentY;
                     }
                 }
-
-                roomArea[middleX, middleY] = 2;
+                
+                if (i == startRoom)
+                {
+                    roomArea[middleX, middleY] = 3;
+                }
+                else if (i == endRoom)
+                {
+                    roomArea[middleX, middleY] = 4;
+                }
+                else
+                {
+                    roomArea[middleX, middleY] = 2;
+                }
             }
         }
 
@@ -290,6 +364,7 @@ public class DungeonGenerator : MonoBehaviour
 
     public void SpawnDungeon()
     {
+        bool hasPlacedStart = false;
         for (int i = 0; i < fullDungeonArray.GetLength(0); i++)
         {
             for (int j = 0; j < fullDungeonArray.GetLength(1); j++)
@@ -300,9 +375,18 @@ public class DungeonGenerator : MonoBehaviour
                     {
                         floorObjects.Add(Instantiate(floorPrefab, new Vector3(i, 0, j), Quaternion.identity));
                     }
-                    else
+                    else if (fullDungeonArray[i, j] == 2)
                     {
                         floorObjects.Add(Instantiate(roomCenter, new Vector3(i, 0, j), Quaternion.identity));
+                    }
+                    else if (fullDungeonArray[i, j] == 3 && !hasPlacedStart)
+                    {
+                        floorObjects.Add(Instantiate(startSpace, new Vector3(i, 0, j), Quaternion.identity));
+                        hasPlacedStart = true;
+                    }
+                    else
+                    {
+                        floorObjects.Add(Instantiate(endSpace, new Vector3(i, 0, j), Quaternion.identity));
                     }
                 }
             }
