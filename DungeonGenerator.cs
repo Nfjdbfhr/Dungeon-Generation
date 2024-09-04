@@ -48,10 +48,16 @@ public class DungeonGenerator : MonoBehaviour
 
     public void GenerateDungeon()
     {
+        rooms.Clear();
+        roomCenters.Clear();
+
         for (int i = 0; i < floorObjects.Count; i++)
         {
             Destroy(floorObjects[i]);
         }
+        
+        floorObjects.Clear();
+
         for (int i = 0; i < numOfRooms; i++)
         {
             rooms.Add(new int[maxRoomWidth, maxRoomLength]);
