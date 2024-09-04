@@ -88,7 +88,7 @@ public class DungeonGenerator : MonoBehaviour
 
             int[,] roomArea = rooms[i];
 
-            int roomType = Random.Range(1, 8);
+            int roomType = Random.Range(1, 9);
 
             if (roomType == 1)
             {
@@ -122,7 +122,7 @@ public class DungeonGenerator : MonoBehaviour
                     roomArea[centerRow, centerColumn] = 2;
                 }
             }
-            else if (roomType == 2)
+            else if (roomType == 2  || roomType == 3)
             {
                 int length = Random.Range(minRoomLength, maxRoomLength + 1);
                 int width = Random.Range(minRoomWidth, maxRoomWidth + 1);
@@ -154,51 +154,29 @@ public class DungeonGenerator : MonoBehaviour
                     roomArea[centerRow, centerColumn] = 2;
                 }
 
-                int roomDirection = 0;
+                int position = Random.Range(0, 2);
 
-                // horizonal
-                if (length > width)
+                if (position == 0)
                 {
-                    roomDirection = 1;
-                }
-                // vertical
-                else if (width > length)
-                {
-                    roomDirection = 2;
-                }
-                // a square
-                else
-                {
-                    continue;
-                }
-
-                if (roomDirection == 1)
-                {
-                    // top left
-                    int position = Random.Range(0, 2);
-
-                    if (position == 0)
+                    int distanceOut = Random.Range(0, rowsDown);
+                    int lengthOut = Random.Range(2, length);
+                    for (int row = rowsDown - distanceOut; row < rowsDown; row++)
                     {
-                        int distanceOut = Random.Range(0, rowsDown);
-                        int lengthOut = Random.Range(2, length);
-                        for (int row = rowsDown - distanceOut; row < rowsDown; row++)
+                        for (int col = columnsRight; col < columnsRight + lengthOut; col++)
                         {
-                            for (int col = columnsRight; col < columnsRight + lengthOut; col++)
-                            {
-                                roomArea[row, col] = 1;
-                            }
+                            roomArea[row, col] = 1;
                         }
                     }
-                    else if (position == 1)
+                }
+                else if (position == 1)
+                {
+                    int distanceOut = Random.Range(0, rowsDown);
+                    int lengthOut = Random.Range(2, length);
+                    for (int row = rowsDown - distanceOut; row < rowsDown; row++)
                     {
-                        int distanceOut = Random.Range(0, rowsDown);
-                        int lengthOut = Random.Range(2, length);
-                        for (int row = rowsDown - distanceOut; row < rowsDown; row++)
+                        for (int col = columnsRight + length - 1; col >= columnsRight + length - lengthOut; col--)
                         {
-                            for (int col = columnsRight + length - 1; col >= columnsRight + length - lengthOut; col--)
-                            {
-                                roomArea[row, col] = 1;
-                            }
+                            roomArea[row, col] = 1;
                         }
                     }
                 }
