@@ -9,7 +9,7 @@ public class DungeonGenerator : MonoBehaviour
     public int maxRoomWidth = 15;
     public int minRoomWidth = 5;
     public int numOfRooms = 9;
-    public int minRooms = 5;
+    public int minRooms = 4;
 
     public GameObject floorPrefab;
     public GameObject roomCenter;
@@ -74,7 +74,7 @@ public class DungeonGenerator : MonoBehaviour
 
         for (int i = 0; i < rooms.Count; i++)
         {
-            if (roomSkipsLeft > 0 && Random.Range(0, 4) == 2)
+            if (roomSkipsLeft > 0 && Random.Range(0, 4) == 2 && i != rooms.Count - 1)
             {
                 roomSkipsLeft--;
                 continue;
