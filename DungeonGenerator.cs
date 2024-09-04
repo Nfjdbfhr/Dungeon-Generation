@@ -9,7 +9,7 @@ public class DungeonGenerator : MonoBehaviour
     public int maxRoomWidth = 15;
     public int minRoomWidth = 5;
     public int numOfRooms = 9;
-    public int minRooms = 4;
+    public int minRooms = 5;
 
     public GameObject floorPrefab;
     public GameObject roomCenter;
@@ -81,35 +81,190 @@ public class DungeonGenerator : MonoBehaviour
             }
 
             int[,] roomArea = rooms[i];
-        
-            int length = Random.Range(minRoomLength, maxRoomLength + 1);
-            int width = Random.Range(minRoomWidth, maxRoomWidth + 1);
-        
-            int rowsDown = Random.Range(0, (maxRoomWidth - width) + 1);
-            int columnsRight = Random.Range(0, (maxRoomLength - length) + 1);
 
-            for (int j = columnsRight; j < columnsRight + length; j++)
+            int roomType = Random.Range(1, 8);
+
+            if (roomType == 1)
             {
-                roomArea[rowsDown, j] = 1;
-                roomArea[rowsDown + width - 1, j] = 1;
-            }
-            for (int j = rowsDown; j < rowsDown + width; j++)
-            {
-                for (int k = columnsRight; k < columnsRight + length; k++)
+                int length = Random.Range(minRoomLength, maxRoomLength + 1);
+                int width = Random.Range(minRoomWidth, maxRoomWidth + 1);
+        
+                int rowsDown = Random.Range(0, (maxRoomWidth - width) + 1);
+                int columnsRight = Random.Range(0, (maxRoomLength - length) + 1);
+
+                for (int j = columnsRight; j < columnsRight + length; j++)
                 {
-                    roomArea[j, k] = 1;
+                    roomArea[rowsDown, j] = 1;
+                    roomArea[rowsDown + width - 1, j] = 1;
+                }
+                for (int j = rowsDown; j < rowsDown + width; j++)
+                {
+                    for (int k = columnsRight; k < columnsRight + length; k++)
+                    {
+                        roomArea[j, k] = 1;
+                    }
+
+                    roomArea[j, columnsRight] = 1;
+                    roomArea[j, columnsRight + length - 1] = 1;
                 }
 
-                roomArea[j, columnsRight] = 1;
-                roomArea[j, columnsRight + length - 1] = 1;
+                int centerRow = rowsDown + width / 2;
+                int centerColumn = columnsRight + length / 2;
+
+                if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
+                {
+                    roomArea[centerRow, centerColumn] = 2;
+                }
             }
-
-            int centerRow = rowsDown + width / 2;
-            int centerColumn = columnsRight + length / 2;
-
-            if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
+            else if (roomType == 2)
             {
-                roomArea[centerRow, centerColumn] = 2;
+                int length = Random.Range(minRoomLength, maxRoomLength + 1);
+                int width = Random.Range(minRoomWidth, maxRoomWidth + 1);
+        
+                int rowsDown = Random.Range(0, (maxRoomWidth - width) + 1);
+                int columnsRight = Random.Range(0, (maxRoomLength - length) + 1);
+
+                for (int j = columnsRight; j < columnsRight + length; j++)
+                {
+                    roomArea[rowsDown, j] = 1;
+                    roomArea[rowsDown + width - 1, j] = 1;
+                }
+                for (int j = rowsDown; j < rowsDown + width; j++)
+                {
+                    for (int k = columnsRight; k < columnsRight + length; k++)
+                    {
+                        roomArea[j, k] = 1;
+                    }
+
+                    roomArea[j, columnsRight] = 1;
+                    roomArea[j, columnsRight + length - 1] = 1;
+                }
+
+                int centerRow = rowsDown + width / 2;
+                int centerColumn = columnsRight + length / 2;
+
+                if (centerRow < roomArea.GetLength(0) && centerColumn < roomArea.GetLength(1))
+                {
+                    roomArea[centerRow, centerColumn] = 2;
+                }
+
+                int roomDirection = 0;
+
+                // horizonal
+                if (length > width)
+                {
+                    roomDirection = 1;
+                }
+                // vertical
+                else if (width > length)
+                {
+                    roomDirection = 2;
+                }
+                // a square
+                else
+                {
+                    continue;
+                }
+
+                if (roomDirection == 1)
+                {
+                    // top left
+                    int position = Random.Range(0, 2);
+
+                    if (position == 0)
+                    {
+                        int distanceOut = Random.Range(0, rowsDown);
+                        int lengthOut = Random.Range(2, length);
+                        for (int row = rowsDown - distanceOut; row < rowsDown; row++)
+                        {
+                            for (int col = columnsRight; col < columnsRight + lengthOut; col++)
+                            {
+                                roomArea[row, col] = 1;
+                            }
+                        }
+                    }
+                    else if (position == 1)
+                    {
+                        int distanceOut = Random.Range(0, rowsDown);
+                        int lengthOut = Random.Range(2, length);
+                        for (int row = rowsDown - distanceOut; row < rowsDown; row++)
+                        {
+                            for (int col = columnsRight + length - 1; col >= columnsRight + length - lengthOut; col--)
+                            {
+                                roomArea[row, col] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Define the room size (still within the bounds of max/min length/width).
+                int length = Random.Range(minRoomLength, maxRoomLength + 1);
+                int width = Random.Range(minRoomWidth, maxRoomWidth + 1);
+
+                int rowsDown = Random.Range(0, (maxRoomWidth - width) + 1);
+                int columnsRight = Random.Range(0, (maxRoomLength - length) + 1);
+
+                // Start at a random position inside the room
+                int currentX = Random.Range(rowsDown, rowsDown + width);
+                int currentY = Random.Range(columnsRight, columnsRight + length);
+
+                // Set the total number of steps (amount of floor to be "walked")
+                int totalSteps = Random.Range(((length * width) / 3) + 5, ((length * width) / 2) + 5);
+                totalSteps += 75;
+
+                // Mark the starting position as part of the room
+                roomArea[currentX, currentY] = 1;
+
+                int middleX = 0;
+                int middleY = 0;
+
+                // Random walk directions
+                for (int step = 0; step < totalSteps; step++)
+                {
+                    // Choose a random direction (0 = up, 1 = down, 2 = left, 3 = right)
+                    int direction = Random.Range(0, 4);
+
+                    switch (direction)
+                    {
+                        case 0: // Up
+                            if (currentX > rowsDown)
+                            {
+                                currentX--;
+                            }
+                            break;
+                        case 1: // Down
+                            if (currentX < rowsDown + width - 1)
+                            {
+                                currentX++;
+                            }
+                            break;
+                        case 2: // Left
+                            if (currentY > columnsRight)
+                            {
+                                currentY--;
+                            }
+                            break;
+                        case 3: // Right
+                            if (currentY < columnsRight + length - 1)
+                            {
+                                currentY++;
+                            }
+                            break;
+                    }
+
+                    // Mark the new position as part of the room
+                    roomArea[currentX, currentY] = 1;
+
+                    if (step == 1)
+                    {
+                        middleX = currentX;
+                        middleY = currentY;
+                    }
+                }
+
+                roomArea[middleX, middleY] = 2;
             }
         }
 
