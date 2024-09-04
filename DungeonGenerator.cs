@@ -16,6 +16,7 @@ public class DungeonGenerator : MonoBehaviour
     
     public List<int[,]> rooms = new List<int[,]>();
     public List<RoomCenterCoord> roomCenters = new List<RoomCenterCoord>();
+    public List<GameObject> floorObjects = new List<GameObject>();
 
     public int[,] fullDungeonArray;
 
@@ -36,6 +37,21 @@ public class DungeonGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GenerateDungeon();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void GenerateDungeon()
+    {
+        for (int i = 0; i < floorObjects.Count; i++)
+        {
+            Destroy(floorObjects[i]);
+        }
         for (int i = 0; i < numOfRooms; i++)
         {
             rooms.Add(new int[maxRoomWidth, maxRoomLength]);
@@ -50,12 +66,6 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         GenerateRooms();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
     
     public void GenerateRooms()
@@ -149,11 +159,11 @@ public class DungeonGenerator : MonoBehaviour
                 {
                     if (fullDungeonArray[i, j] == 1)
                     {
-                        Instantiate(floorPrefab, new Vector3(i, 0, j), Quaternion.identity);
+                        floorObjects.Add(Instantiate(floorPrefab, new Vector3(i, 0, j), Quaternion.identity));
                     }
                     else
                     {
-                        Instantiate(roomCenter, new Vector3(i, 0, j), Quaternion.identity);
+                        floorObjects.Add(Instantiate(roomCenter, new Vector3(i, 0, j), Quaternion.identity));
                     }
                 }
             }
